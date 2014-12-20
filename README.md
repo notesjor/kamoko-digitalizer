@@ -23,3 +23,10 @@ Das KAMOKO-Korpus kann ab sofort kostenfrei genutzt werden. Besuchen Sie die fol
 
 Hilfe zum CorpusExplorer finden Sie unter [bitcut.de/help/ce](http://bitcut.de/help/ce).
 
+### Wie erstelle ich CorpusExplorer.Tool4.KAMOKO selbst? ###
+
+1. Laden Sie die Projektmappe mit Visual Studio 2013 oder höher.
+2. Stellen Sie die NuGet-Pakete wieder her.
+3. Aus rechtlichen Gründen fehlen die Icon-Symbole. Ersetzen Sie die fehlenden Ressourcen.
+4. Laden Sie das aktuelle [CorpusExplorer.Sdk](http://notes.jan-oliver-ruediger.de/corpusexplorer/sdk/) herunter.
+5. Download Telerik WinForm 2014.3 oder höher.
