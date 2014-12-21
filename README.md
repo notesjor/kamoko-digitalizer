@@ -1,7 +1,7 @@
 # Projekt KAMOKO: KAsseler MOrgenstern KOrpus #
 ## Unterprojekt: CorpusExplorer.Tool4.KAMOKO ##
 
-### Was ist CorpusExplorer.Tool4.KAMOKO ###
+### KAMOKO-Digitalizer (aka CorpusExplorer.Tool4.KAMOKO) ###
 
 Dieser Editor wurde speziell für die Bedürfnisse des KAMOKO-Projekts (s.u.) entwickelt. Der Editor erlaubt die schnelle Erfassung von Beispielsätzen und Satzvarianten sowie die dazugehörigen Sprecherbewertungen.
 
