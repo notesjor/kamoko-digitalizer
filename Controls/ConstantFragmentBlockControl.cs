@@ -1,22 +1,17 @@
-﻿namespace CorpusExplorer.Tool4.KAMOKO.Controls
+﻿#region
+
+using System;
+using System.Data;
+using CorpusExplorer.Tool4.KAMOKO.Controls.Abstract;
+using CorpusExplorer.Tool4.KAMOKO.Model.Fragment;
+using CorpusExplorer.Tool4.KAMOKO.Model.Fragment.Abstract;
+
+#endregion
+
+namespace CorpusExplorer.Tool4.KAMOKO.Controls
 {
-  using System;
-  using System.Data;
-
-  using CorpusExplorer.Tool4.KAMOKO.Controls.Abstract;
-  using CorpusExplorer.Tool4.KAMOKO.Model.Fragment;
-  using CorpusExplorer.Tool4.KAMOKO.Model.Fragment.Abstract;
-
   public partial class ConstantFragmentBlockControl : AbstractFragmentControl
   {
-    #region Fields
-
-    private readonly AbstractFragment _fragment;
-
-    private readonly int _index;
-
-    #endregion
-
     #region Constructors and Destructors
 
     public ConstantFragmentBlockControl(AbstractFragment fragment)
@@ -32,6 +27,8 @@
 
       _index = f.Index;
       radTextBox1.Text = f.Content;
+      radCheckBox1.Checked = f.IsOriginal;
+
       voteBarControl1.SetSpeakers(f.SpeakerVotes);
     }
 
@@ -42,12 +39,21 @@
     public override AbstractFragment GetFragment()
     {
       return new ConstantFragment
-               {
-                 Index = _index,
-                 Content = radTextBox1.Text,
-                 SpeakerVotes = voteBarControl1.GetSpeakers()
-               };
+      {
+        Index = _index,
+        Content = radTextBox1.Text,
+        IsOriginal = radCheckBox1.Checked,
+        SpeakerVotes = voteBarControl1.GetSpeakers()
+      };
     }
+
+    #endregion
+
+    #region Fields
+
+    private readonly AbstractFragment _fragment;
+
+    private readonly int _index;
 
     #endregion
 
@@ -55,11 +61,13 @@
 
     private void btn_item_add_const_Click(object sender, EventArgs e)
     {
+      btn_item_add.HideDropDown();
       OnAddConstnat(_fragment);
     }
 
     private void btn_item_add_vars_Click(object sender, EventArgs e)
     {
+      btn_item_add.HideDropDown();
       OnAddVariable(_fragment);
     }
 

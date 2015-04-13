@@ -1,10 +1,13 @@
+#region
+
+using System;
+using System.Xml.Serialization;
+using CorpusExplorer.Tool4.KAMOKO.Model.Vote.Abstract;
+
+#endregion
+
 namespace CorpusExplorer.Tool4.KAMOKO.Model.Vote
 {
-  using System;
-  using System.Xml.Serialization;
-
-  using CorpusExplorer.Tool4.KAMOKO.Model.Vote.Abstract;
-
   [XmlRoot]
   [Serializable]
   public class VoteAccept : AbstractVote
@@ -14,10 +17,7 @@ namespace CorpusExplorer.Tool4.KAMOKO.Model.Vote
     [XmlAttribute]
     public override string Label
     {
-      get
-      {
-        return "Zustimmung";
-      }
+      get { return "Zustimmung"; }
     }
 
     #endregion

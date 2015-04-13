@@ -1,16 +1,19 @@
-﻿namespace CorpusExplorer.Tool4.KAMOKO.Controls
+﻿#region
+
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Windows.Forms;
+using CorpusExplorer.Tool4.KAMOKO.Controls.Abstract;
+using CorpusExplorer.Tool4.KAMOKO.Model;
+using CorpusExplorer.Tool4.KAMOKO.Model.Fragment;
+using CorpusExplorer.Tool4.KAMOKO.Model.Fragment.Abstract;
+
+#endregion
+
+namespace CorpusExplorer.Tool4.KAMOKO.Controls
 {
-  using System;
-  using System.Collections.Generic;
-  using System.Data;
-  using System.Linq;
-  using System.Windows.Forms;
-
-  using CorpusExplorer.Tool4.KAMOKO.Controls.Abstract;
-  using CorpusExplorer.Tool4.KAMOKO.Model;
-  using CorpusExplorer.Tool4.KAMOKO.Model.Fragment;
-  using CorpusExplorer.Tool4.KAMOKO.Model.Fragment.Abstract;
-
   public partial class VariusFragmentBlockControl : AbstractFragmentControl
   {
     #region Fields
@@ -42,16 +45,16 @@
     {
       SaveSentence();
       var list = new List<AbstractFragment>();
-      for (var i = this.radScrollablePanel1.PanelContainer.Controls.Count - 1; i > -1; i--)
+      for (var i = radScrollablePanel1.PanelContainer.Controls.Count - 1; i > -1; i--)
       {
-        var afc = this.radScrollablePanel1.PanelContainer.Controls[i] as AbstractFragmentControl;
+        var afc = radScrollablePanel1.PanelContainer.Controls[i] as AbstractFragmentControl;
         if (afc != null)
         {
           list.Add(afc.GetFragment());
         }
       }
 
-      return new VariableFragment { Index = this._fragment.Index, Fragments = list };
+      return new VariableFragment {Index = _fragment.Index, Fragments = list};
     }
 
     #endregion
@@ -61,7 +64,7 @@
     private void ControlOnFragmentAddConstant(AbstractFragment fragment)
     {
       SaveSentence();
-      _fragment.Fragments.Add(new ConstantFragment { Content = "", Index = -1, SpeakerVotes = new List<SpeakerVote>() });
+      _fragment.Fragments.Add(new ConstantFragment {Content = "", Index = -1, SpeakerVotes = new List<SpeakerVote>()});
       LoadSentence();
       FragmentSubAdd(null, null);
     }
@@ -71,19 +74,19 @@
       SaveSentence();
       _fragment.Fragments.Add(
         new VariableFragment
-          {
-            Fragments =
-              new List<AbstractFragment>
-                {
-                  new ConstantFragment
-                    {
-                      Content = "",
-                      Index = 1,
-                      SpeakerVotes =
-                        new List<SpeakerVote>()
-                    }
-                }
-          });      
+        {
+          Fragments =
+            new List<AbstractFragment>
+            {
+              new ConstantFragment
+              {
+                Content = "",
+                Index = 1,
+                SpeakerVotes =
+                  new List<SpeakerVote>()
+              }
+            }
+        });
       LoadSentence();
       FragmentSubAdd(null, null);
     }
@@ -105,7 +108,7 @@
         return;
       }
 
-      
+
       _fragment.Fragments.RemoveAt(idx);
       LoadSentence();
       FragmentSubAdd(null, null);
@@ -120,7 +123,7 @@
         var fragment = _fragment.Fragments[i];
         if (fragment is ConstantFragment)
         {
-          var control = new ConstantFragmentBlockControl(fragment) { Dock = DockStyle.Top };
+          var control = new ConstantFragmentBlockControl(fragment) {Dock = DockStyle.Top};
           control.FragmentAddConstant += ControlOnFragmentAddConstant;
           control.FragmentAddVariable += ControlOnFragmentAddVariable;
           control.FragmentDelete += ControlOnFragmentDelete;
@@ -129,7 +132,7 @@
         }
         else if (fragment is VariableFragment)
         {
-          var control = new VariusFragmentBlockControl(fragment) { Dock = DockStyle.Top };
+          var control = new VariusFragmentBlockControl(fragment) {Dock = DockStyle.Top};
           control.FragmentAddConstant += ControlOnFragmentAddConstant;
           control.FragmentAddVariable += ControlOnFragmentAddVariable;
           control.FragmentDelete += ControlOnFragmentDelete;
@@ -147,7 +150,7 @@
     private void SaveSentence()
     {
       var fragments = new List<AbstractFragment>();
-      for (int i = radScrollablePanel1.PanelContainer.Controls.Count - 1; i > -1; i--)
+      for (var i = radScrollablePanel1.PanelContainer.Controls.Count - 1; i > -1; i--)
       {
         var afc = radScrollablePanel1.PanelContainer.Controls[i] as AbstractFragmentControl;
         if (afc == null) continue;
@@ -159,12 +162,14 @@
 
     private void btn_item_add_const_Click(object sender, EventArgs e)
     {
+      btn_item_add.HideDropDown();
       SaveSentence();
       OnAddConstnat(_fragment);
     }
 
     private void btn_item_add_vars_Click(object sender, EventArgs e)
     {
+      btn_item_add.HideDropDown();
       SaveSentence();
       OnAddVariable(_fragment);
     }

@@ -1,13 +1,17 @@
-﻿namespace CorpusExplorer.Tool4.KAMOKO.Controls
+﻿#region
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
+using CorpusExplorer.Terminal.WinForm.Helper;
+using CorpusExplorer.Tool4.KAMOKO.Controls.Abstract;
+using CorpusExplorer.Tool4.KAMOKO.Model;
+
+#endregion
+
+namespace CorpusExplorer.Tool4.KAMOKO.Controls
 {
-  using System;
-  using System.Collections.Generic;
-  using System.Linq;
-  using System.Windows.Forms;
-
-  using CorpusExplorer.Tool4.KAMOKO.Controls.Abstract;
-  using CorpusExplorer.Tool4.KAMOKO.Model;
-
   public partial class VoteBarControl : AbstractUserControl
   {
     #region Fields
@@ -21,6 +25,7 @@
     public VoteBarControl()
     {
       InitializeComponent();
+      components = new DisposingContainer();
     }
 
     #endregion
@@ -46,17 +51,20 @@
     private void LoadData()
     {
       radScrollablePanel1.Controls.Clear();
+      components.Dispose();
 
       foreach (var vote in _votes)
       {
-        radScrollablePanel1.PanelContainer.Controls.Add(new VoteControl(vote) { Dock = DockStyle.Left });
+        var control = new VoteControl(vote) {Dock = DockStyle.Left};
+        components.Add(control);
+        radScrollablePanel1.PanelContainer.Controls.Add(control);
       }
     }
 
     private void SaveData()
     {
       _votes =
-        this.radScrollablePanel1.PanelContainer.Controls.OfType<VoteControl>()
+        radScrollablePanel1.PanelContainer.Controls.OfType<VoteControl>()
           .Select(vc => vc.GetSpeakerVote())
           .Where(sv => sv.Vote != null)
           .ToList();
@@ -65,7 +73,9 @@
     private void btn_item_add_Click(object sender, EventArgs e)
     {
       SaveData();
-      _votes.Add(new SpeakerVote { SpeakerIndex = _votes.Count == 0 ? 1 : _votes.Last().SpeakerIndex + 1 });
+
+      _votes.Add(new SpeakerVote {SpeakerIndex = _votes.Count == 0 ? 1 : _votes.Last().SpeakerIndex + 1});
+
       LoadData();
     }
 

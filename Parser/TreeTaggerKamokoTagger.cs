@@ -1,23 +1,149 @@
-﻿namespace CorpusExplorer.Sdk.Utils.DocumentProcessing.Parser
+﻿#region
+
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using CorpusExplorer.Core.Tagger.TreeTagger.Abstract;
+using CorpusExplorer.Sdk.Helper;
+using CorpusExplorer.Sdk.Model;
+using CorpusExplorer.Sdk.Model.Scraper;
+
+#endregion
+
+namespace CorpusExplorer.Tool4.KAMOKO.Parser
 {
-  using System;
-  using System.Collections.Generic;
-  using System.Diagnostics;
-  using System.Globalization;
-  using System.IO;
-  using System.Linq;
-  using System.Text;
-  using System.Text.RegularExpressions;
-  using System.Threading.Tasks;
-
-  using CorpusExplorer.Sdk.Helper;
-  using CorpusExplorer.Sdk.Model;
-  using CorpusExplorer.Sdk.Model.Scraper;
-  using CorpusExplorer.Sdk.Utils.DocumentProcessing.Parser.Abstract;
-
-  public class TreeTaggerKamokoParser : AbstractParser
+  public class TreeTaggerKamokoTagger : AbstractTreeTaggerTagger
   {
     private readonly int _speakerCount;
+
+    #region Constructors and Destructors
+
+    /// <summary>
+    ///   Initializes a new instance of the <see cref="Obsolet.Parser.TreeTagger" /> class.
+    /// </summary>
+    public TreeTaggerKamokoTagger(int speakerCount)
+    {
+      _speakerCount = speakerCount;
+
+      _listLemma.Add(" ");
+      _listPos.Add(" ");
+      _listWort.Add(" ");
+
+      _listSatz.Add(" ");
+      _listSatz.Add(",");
+      _listSatz.Add(".");
+      _listSatz.Add("?");
+      _listSatz.Add("!");
+      _listSatz.Add(";");
+      _listSatz.Add(":");
+      _listSatz.Add("-");
+      _listSatz.Add("[");
+      _listSatz.Add("]");
+      _listSatz.Add("(");
+      _listSatz.Add(")");
+
+      _listPhrase.Add(" ");
+      _listPhrase.Add("NC");
+      _listPhrase.Add("PC");
+      _listPhrase.Add("VC");
+
+      _listSpeaker.Add(" ");
+      _listSpeaker.Add("Zustimmung");
+      _listSpeaker.Add("Ablehnung");
+      _listSpeaker.Add("Bedingte Zustimmung");
+
+      _listOriginal.Add(" ");
+      _listOriginal.Add("Original");
+    }
+
+    #endregion
+
+    #region Public Methods and Operators
+
+    public override Corpus Execute()
+    {
+      if (ScraperResults == null || !ScraperResults.Any())
+      {
+        return null;
+      }
+
+      _docs = ScraperResults.ToList();
+
+      ParseMetadata();
+
+      ParseScrapDocumentWithTreeTagger(TreeTaggerBatchFilename, _docs);
+
+      Task.WaitAll(_tasks.ToArray());
+
+      var layers = new List<Layer>
+      {
+        new Layer(_docLemma, _listLemma, new Dictionary<string, object>()) {Displayname = "Lemma"},
+        new Layer(_docPhrase, _listPhrase, new Dictionary<string, object>()) {Displayname = "Phrase"},
+        new Layer(_docPos, _listPos, new Dictionary<string, object>()) {Displayname = "POS"},
+        new Layer(_docSatz, _listSatz, new Dictionary<string, object>()) {Displayname = "Satz"},
+        new Layer(_docWort, _listWort, new Dictionary<string, object>()) {Displayname = "Wort"},
+        new Layer(_docOrignal, _listOriginal, new Dictionary<string, object>()){Displayname = "Original"}
+      };
+
+      if (_speakerCount >= 1)
+        layers.Add(new Layer(_docSpeaker1, _listSpeaker, new Dictionary<string, object>())
+        {
+          Displayname = "Sprecher 1"
+        });
+
+      if (_speakerCount >= 2)
+        layers.Add(new Layer(_docSpeaker2, _listSpeaker, new Dictionary<string, object>())
+        {
+          Displayname = "Sprecher 2"
+        });
+
+      if (_speakerCount >= 3)
+        layers.Add(new Layer(_docSpeaker3, _listSpeaker, new Dictionary<string, object>())
+        {
+          Displayname = "Sprecher 3"
+        });
+
+      if (_speakerCount >= 4)
+        layers.Add(new Layer(_docSpeaker4, _listSpeaker, new Dictionary<string, object>())
+        {
+          Displayname = "Sprecher 4"
+        });
+
+      if (_speakerCount >= 5)
+        layers.Add(new Layer(_docSpeaker5, _listSpeaker, new Dictionary<string, object>())
+        {
+          Displayname = "Sprecher 5"
+        });
+
+      if (_speakerCount >= 6)
+        layers.Add(new Layer(_docSpeaker6, _listSpeaker, new Dictionary<string, object>())
+        {
+          Displayname = "Sprecher 6"
+        });
+
+      if (_speakerCount >= 7)
+        layers.Add(new Layer(_docSpeaker7, _listSpeaker, new Dictionary<string, object>())
+        {
+          Displayname = "Sprecher 7"
+        });
+
+      if (_speakerCount >= 8)
+        layers.Add(new Layer(_docSpeaker8, _listSpeaker, new Dictionary<string, object>())
+        {
+          Displayname = "Sprecher 8"
+        });
+
+      return Corpus.Create(CorpusName, layers, _meta);
+    }
+
+    #endregion
 
     #region Fields
 
@@ -41,11 +167,6 @@
     /// </summary>
     private readonly Dictionary<Guid, int[][]> _docSatz = new Dictionary<Guid, int[][]>();
 
-    /// <summary>
-    ///   The _doc wort.
-    /// </summary>
-    private readonly Dictionary<Guid, int[][]> _docWort = new Dictionary<Guid, int[][]>();
-
 
     private readonly Dictionary<Guid, int[][]> _docSpeaker1 = new Dictionary<Guid, int[][]>();
     private readonly Dictionary<Guid, int[][]> _docSpeaker2 = new Dictionary<Guid, int[][]>();
@@ -55,6 +176,13 @@
     private readonly Dictionary<Guid, int[][]> _docSpeaker6 = new Dictionary<Guid, int[][]>();
     private readonly Dictionary<Guid, int[][]> _docSpeaker7 = new Dictionary<Guid, int[][]>();
     private readonly Dictionary<Guid, int[][]> _docSpeaker8 = new Dictionary<Guid, int[][]>();
+
+    private readonly Dictionary<Guid, int[][]> _docOrignal = new Dictionary<Guid, int[][]>();
+
+    /// <summary>
+    ///   The _doc wort.
+    /// </summary>
+    private readonly Dictionary<Guid, int[][]> _docWort = new Dictionary<Guid, int[][]>();
 
 
     /// <summary>
@@ -77,18 +205,14 @@
     /// </summary>
     private readonly ListOptimized<string> _listSatz = new ListOptimized<string>();
 
+    private readonly ListOptimized<string> _listSpeaker = new ListOptimized<string>();
+
+    private readonly ListOptimized<string> _listOriginal = new ListOptimized<string>();
+
     /// <summary>
     ///   The _list wort.
     /// </summary>
     private readonly ListOptimized<string> _listWort = new ListOptimized<string>();
-
-    private readonly ListOptimized<string> _listSpeaker = new ListOptimized<string>();
-
-    /// <summary>
-    ///   The _meta.
-    /// </summary>
-    private readonly Dictionary<Guid, Dictionary<string, object>> _meta =
-      new Dictionary<Guid, Dictionary<string, object>>();
 
     /// <summary>
     ///   The _request index lock.
@@ -105,44 +229,11 @@
     /// </summary>
     private List<ScrapDocument> _docs;
 
-    #endregion
-
-    #region Constructors and Destructors
-
     /// <summary>
-    ///   Initializes a new instance of the <see cref="Obsolet.Parser.TreeTagger" /> class.
+    ///   The _meta.
     /// </summary>
-    public TreeTaggerKamokoParser(int speakerCount)
-    {
-      this._speakerCount = speakerCount;
-
-      this._listLemma.Add(" ");
-      this._listPos.Add(" ");
-      this._listWort.Add(" ");
-
-      this._listSatz.Add(" ");
-      this._listSatz.Add(",");
-      this._listSatz.Add(".");
-      this._listSatz.Add("?");
-      this._listSatz.Add("!");
-      this._listSatz.Add(";");
-      this._listSatz.Add(":");
-      this._listSatz.Add("-");
-      this._listSatz.Add("[");
-      this._listSatz.Add("]");
-      this._listSatz.Add("(");
-      this._listSatz.Add(")");
-
-      this._listPhrase.Add(" ");
-      this._listPhrase.Add("NC");
-      this._listPhrase.Add("PC");
-      this._listPhrase.Add("VC");
-
-      this._listSpeaker.Add(" ");
-      this._listSpeaker.Add("Zustimmung");
-      this._listSpeaker.Add("Ablehnung");
-      this._listSpeaker.Add("Bedingte Zustimmung");
-    }
+    private Dictionary<Guid, Dictionary<string, object>> _meta =
+      new Dictionary<Guid, Dictionary<string, object>>();
 
     #endregion
 
@@ -150,77 +241,19 @@
 
     public override string DisplayName
     {
-      get
-      {
-        return "TreeTagger (Layer) / KAMOKO-Edition";
-      }
+      get { return "TreeTagger (Layer) / KAMOKO-Edition"; }
     }
 
     public override bool IsReady
     {
       get
       {
-        return this.ScraperResults != null && (!string.IsNullOrEmpty(this.CorpusName))
-               && (!string.IsNullOrEmpty(this.TreeTaggerBatchFilename));
+        return ScraperResults != null && (!string.IsNullOrEmpty(CorpusName))
+               && (!string.IsNullOrEmpty(TreeTaggerBatchFilename));
       }
     }
 
     public string TreeTaggerBatchFilename { get; set; }
-
-    #endregion
-
-    #region Public Methods and Operators
-
-    public override Corpus Execute()
-    {
-      if (ScraperResults == null || !ScraperResults.Any())
-      {
-        return null;
-      }
-
-      this._docs = ScraperResults.ToList();
-
-      this.ParseMetadata();
-
-      this.ParseScrapDocumentWithTreeTagger(TreeTaggerBatchFilename, _docs);
-
-      Task.WaitAll(this._tasks.ToArray());
-
-      var layers = new List<Layer>
-                     {
-                       new Layer(this._docLemma, this._listLemma, new Dictionary<string, object>()) { Displayname  = "Lemma"},
-                       new Layer(this._docPhrase, this._listPhrase, new Dictionary<string, object>()) {Displayname="Phrase"},
-                       new Layer(this._docPos, this._listPos, new Dictionary<string, object>()){Displayname="POS"},
-                       new Layer(this._docSatz, this._listSatz, new Dictionary<string, object>()){Displayname="Satz"},
-                       new Layer(this._docWort, this._listWort, new Dictionary<string, object>()){Displayname="Wort"}
-                     };
-
-      if(1 >= _speakerCount)
-        layers.Add(new Layer(this._docSpeaker1, _listSpeaker, new Dictionary<string, object>()) { Displayname = "Sprecher 1"});
-
-      if(2 >= _speakerCount)
-        layers.Add(new Layer(this._docSpeaker2, _listSpeaker, new Dictionary<string, object>()) { Displayname = "Sprecher 2"});
-
-      if(3 >= _speakerCount)
-        layers.Add(new Layer(this._docSpeaker3, _listSpeaker, new Dictionary<string, object>()) { Displayname = "Sprecher 3"});
-
-      if(4 >= _speakerCount)
-        layers.Add(new Layer(this._docSpeaker4, _listSpeaker, new Dictionary<string, object>()) { Displayname = "Sprecher 4"});
-
-      if(5 >= _speakerCount)
-        layers.Add(new Layer(this._docSpeaker5, _listSpeaker, new Dictionary<string, object>()) { Displayname = "Sprecher 5"});
-
-      if(6 >= _speakerCount)
-        layers.Add(new Layer(this._docSpeaker6, _listSpeaker, new Dictionary<string, object>()) { Displayname = "Sprecher 6"});
-
-      if(7 >= _speakerCount)
-        layers.Add(new Layer(this._docSpeaker7, _listSpeaker, new Dictionary<string, object>()) { Displayname = "Sprecher 7"});
-
-      if(8 >= _speakerCount)
-        layers.Add(new Layer(this._docSpeaker8, _listSpeaker, new Dictionary<string, object>()) { Displayname = "Sprecher 8"});
-
-      return Corpus.Create(CorpusName, layers, this._meta);
-    }
 
     #endregion
 
@@ -233,7 +266,7 @@
     ///   The tree tagger path.
     /// </param>
     /// <param name="parserSkript">
-    ///   The parser skript.
+    ///   The Tagger skript.
     /// </param>
     /// <param name="f">
     ///   The f.
@@ -261,22 +294,22 @@
         }
 
         var process = new Process
-                        {
-                          StartInfo =
-                            {
-                              FileName =
-                                Path.Combine(
-                                  Configuration.ExternAppTreetaggerPath,
-                                  "bin\\" + parserSkript),
-                              Arguments = f + " > " + fout,
-                              RedirectStandardError = true,
-                              CreateNoWindow = true,
-                              UseShellExecute = false,
-                              RedirectStandardOutput = true,
-                              WindowStyle = ProcessWindowStyle.Hidden,
-                              StandardOutputEncoding = enc
-                            }
-                        };
+        {
+          StartInfo =
+          {
+            FileName =
+              Path.Combine(
+                Configuration.ExternAppTreetaggerPath,
+                "bin\\" + parserSkript),
+            Arguments = f + " > " + fout,
+            RedirectStandardError = true,
+            CreateNoWindow = true,
+            UseShellExecute = false,
+            RedirectStandardOutput = true,
+            WindowStyle = ProcessWindowStyle.Hidden,
+            StandardOutputEncoding = enc
+          }
+        };
         process.Start();
         //var outOut = process.StandardOutput.ReadToEnd();
         //var outErr = process.StandardError.ReadToEnd();
@@ -316,6 +349,7 @@
       var cacheLemma = new Dictionary<string, int>();
       var cachePos = new Dictionary<string, int>();
       var cacheSpeaker = new Dictionary<string, int>();
+      var cacheOrignial = new Dictionary<string, int>();
 
       var satzWort = new List<int>();
       var satzLemma = new List<int>();
@@ -325,11 +359,12 @@
       var satzSpeaker1 = new List<int>();
       var satzSpeaker2 = new List<int>();
       var satzSpeaker3 = new List<int>();
-      var satzSpeaker4 = new List<int>(); 
+      var satzSpeaker4 = new List<int>();
       var satzSpeaker5 = new List<int>();
       var satzSpeaker6 = new List<int>();
       var satzSpeaker7 = new List<int>();
       var satzSpeaker8 = new List<int>();
+      var satzOriginal = new List<int>();
 
 
       var docWort = new List<int[]>();
@@ -345,19 +380,21 @@
       var docSpeaker6 = new List<int[]>();
       var docSpeaker7 = new List<int[]>();
       var docSpeaker8 = new List<int[]>();
+      var docOriginal = new List<int[]>();
 
       var satzende = new HashSet<string> { ".", "!", "?" };
 
-      var phrase = this.RequestIndex(cachePhrase, this._listPhrase, " ");
-      var speaker1 = this.RequestIndex(cacheSpeaker, this._listSpeaker, " ");
-      var speaker2 = this.RequestIndex(cacheSpeaker, this._listSpeaker, " ");
-      var speaker3 = this.RequestIndex(cacheSpeaker, this._listSpeaker, " ");
-      var speaker4 = this.RequestIndex(cacheSpeaker, this._listSpeaker, " ");
-      var speaker5 = this.RequestIndex(cacheSpeaker, this._listSpeaker, " ");
-      var speaker6 = this.RequestIndex(cacheSpeaker, this._listSpeaker, " ");
-      var speaker7 = this.RequestIndex(cacheSpeaker, this._listSpeaker, " ");
-      var speaker8 = this.RequestIndex(cacheSpeaker, this._listSpeaker, " ");
-      var satzNo = this.RequestIndex(cacheSatz, this._listSatz, " ");
+      var phrase = RequestIndex(cachePhrase, _listPhrase, " ");
+      var speaker1 = RequestIndex(cacheSpeaker, _listSpeaker, " ");
+      var speaker2 = RequestIndex(cacheSpeaker, _listSpeaker, " ");
+      var speaker3 = RequestIndex(cacheSpeaker, _listSpeaker, " ");
+      var speaker4 = RequestIndex(cacheSpeaker, _listSpeaker, " ");
+      var speaker5 = RequestIndex(cacheSpeaker, _listSpeaker, " ");
+      var speaker6 = RequestIndex(cacheSpeaker, _listSpeaker, " ");
+      var speaker7 = RequestIndex(cacheSpeaker, _listSpeaker, " ");
+      var speaker8 = RequestIndex(cacheSpeaker, _listSpeaker, " ");
+      var original = RequestIndex(cacheOrignial, _listOriginal, " ");
+      var satzNo = RequestIndex(cacheSatz, _listSatz, " ");
 
       foreach (var line in data)
       {
@@ -376,6 +413,7 @@
           satzSpeaker6 = new List<int>();
           satzSpeaker7 = new List<int>();
           satzSpeaker8 = new List<int>();
+          satzOriginal = new List<int>();
         }
 
         if (line.Length == 1 || line[0][0] == '<')
@@ -387,38 +425,49 @@
               case '/':
                 if (line[0] == "</M>")
                 {
-                  speaker1 = this.RequestIndex(cacheSpeaker, this._listSpeaker, " ");
-                  speaker2 = this.RequestIndex(cacheSpeaker, this._listSpeaker, " ");
-                  speaker3 = this.RequestIndex(cacheSpeaker, this._listSpeaker, " ");
-                  speaker4 = this.RequestIndex(cacheSpeaker, this._listSpeaker, " ");
-                  speaker5 = this.RequestIndex(cacheSpeaker, this._listSpeaker, " ");
-                  speaker6 = this.RequestIndex(cacheSpeaker, this._listSpeaker, " ");
-                  speaker7 = this.RequestIndex(cacheSpeaker, this._listSpeaker, " ");
-                  speaker8 = this.RequestIndex(cacheSpeaker, this._listSpeaker, " ");
+                  speaker1 = RequestIndex(cacheSpeaker, _listSpeaker, " ");
+                  speaker2 = RequestIndex(cacheSpeaker, _listSpeaker, " ");
+                  speaker3 = RequestIndex(cacheSpeaker, _listSpeaker, " ");
+                  speaker4 = RequestIndex(cacheSpeaker, _listSpeaker, " ");
+                  speaker5 = RequestIndex(cacheSpeaker, _listSpeaker, " ");
+                  speaker6 = RequestIndex(cacheSpeaker, _listSpeaker, " ");
+                  speaker7 = RequestIndex(cacheSpeaker, _listSpeaker, " ");
+                  speaker8 = RequestIndex(cacheSpeaker, _listSpeaker, " ");
+                  original = RequestIndex(cacheOrignial, _listOriginal, " ");
                 }
                 else
                 {
-                  phrase = this.RequestIndex(cachePhrase, this._listPhrase, " ");
+                  phrase = RequestIndex(cachePhrase, _listPhrase, " ");
                 }
                 break;
               case 'P':
-                phrase = this.RequestIndex(cachePhrase, this._listPhrase, "PC");
+                phrase = RequestIndex(cachePhrase, _listPhrase, "PC");
                 break;
               case 'V':
-                phrase = this.RequestIndex(cachePhrase, this._listPhrase, "VC");
+                phrase = RequestIndex(cachePhrase, _listPhrase, "VC");
                 break;
               case 'N':
-                phrase = this.RequestIndex(cachePhrase, this._listPhrase, "NC");
+                phrase = RequestIndex(cachePhrase, _listPhrase, "NC");
                 break;
               case 'M': // M = Meinung
-                speaker1 = this.RequestIndex(cacheSpeaker, this._listSpeaker, line[0].Contains("S1B") ? "Bedingte Zustimmung" : line[0].Contains("S1Z") ? "Zustimmung" : "Ablehnung");
-                speaker2 = this.RequestIndex(cacheSpeaker, this._listSpeaker, line[0].Contains("S2B") ? "Bedingte Zustimmung" : line[0].Contains("S2Z") ? "Zustimmung" : "Ablehnung");
-                speaker3 = this.RequestIndex(cacheSpeaker, this._listSpeaker, line[0].Contains("S3B") ? "Bedingte Zustimmung" : line[0].Contains("S3Z") ? "Zustimmung" : "Ablehnung");
-                speaker4 = this.RequestIndex(cacheSpeaker, this._listSpeaker, line[0].Contains("S4B") ? "Bedingte Zustimmung" : line[0].Contains("S4Z") ? "Zustimmung" : "Ablehnung");
-                speaker5 = this.RequestIndex(cacheSpeaker, this._listSpeaker, line[0].Contains("S5B") ? "Bedingte Zustimmung" : line[0].Contains("S5Z") ? "Zustimmung" : "Ablehnung");
-                speaker6 = this.RequestIndex(cacheSpeaker, this._listSpeaker, line[0].Contains("S6B") ? "Bedingte Zustimmung" : line[0].Contains("S6Z") ? "Zustimmung" : "Ablehnung");
-                speaker7 = this.RequestIndex(cacheSpeaker, this._listSpeaker, line[0].Contains("S7B") ? "Bedingte Zustimmung" : line[0].Contains("S7Z") ? "Zustimmung" : "Ablehnung");
-                speaker8 = this.RequestIndex(cacheSpeaker, this._listSpeaker, line[0].Contains("S8B") ? "Bedingte Zustimmung" : line[0].Contains("S8Z") ? "Zustimmung" : "Ablehnung");
+                speaker1 = RequestIndex(cacheSpeaker, _listSpeaker,
+                  line[0].Contains("S1B") ? "Bedingte Zustimmung" : line[0].Contains("S1Z") ? "Zustimmung" : "Ablehnung");
+                speaker2 = RequestIndex(cacheSpeaker, _listSpeaker,
+                  line[0].Contains("S2B") ? "Bedingte Zustimmung" : line[0].Contains("S2Z") ? "Zustimmung" : "Ablehnung");
+                speaker3 = RequestIndex(cacheSpeaker, _listSpeaker,
+                  line[0].Contains("S3B") ? "Bedingte Zustimmung" : line[0].Contains("S3Z") ? "Zustimmung" : "Ablehnung");
+                speaker4 = RequestIndex(cacheSpeaker, _listSpeaker,
+                  line[0].Contains("S4B") ? "Bedingte Zustimmung" : line[0].Contains("S4Z") ? "Zustimmung" : "Ablehnung");
+                speaker5 = RequestIndex(cacheSpeaker, _listSpeaker,
+                  line[0].Contains("S5B") ? "Bedingte Zustimmung" : line[0].Contains("S5Z") ? "Zustimmung" : "Ablehnung");
+                speaker6 = RequestIndex(cacheSpeaker, _listSpeaker,
+                  line[0].Contains("S6B") ? "Bedingte Zustimmung" : line[0].Contains("S6Z") ? "Zustimmung" : "Ablehnung");
+                speaker7 = RequestIndex(cacheSpeaker, _listSpeaker,
+                  line[0].Contains("S7B") ? "Bedingte Zustimmung" : line[0].Contains("S7Z") ? "Zustimmung" : "Ablehnung");
+                speaker8 = RequestIndex(cacheSpeaker, _listSpeaker,
+                  line[0].Contains("S8B") ? "Bedingte Zustimmung" : line[0].Contains("S8Z") ? "Zustimmung" : "Ablehnung");
+                original = RequestIndex(cacheOrignial, _listOriginal,
+                  line[0].Contains("ORIGINAL") ? "Original" : " ");
                 break;
             }
           }
@@ -426,9 +475,9 @@
           continue;
         }
 
-        satzWort.Add(this.RequestIndex(cacheWort, this._listWort, line[0]));
-        satzPos.Add(this.RequestIndex(cachePos, this._listPos, line[1]));
-        satzLemma.Add(this.RequestIndex(cacheLemma, this._listLemma, line[2]));
+        satzWort.Add(RequestIndex(cacheWort, _listWort, line[0]));
+        satzPos.Add(RequestIndex(cachePos, _listPos, line[1]));
+        satzLemma.Add(RequestIndex(cacheLemma, _listLemma, line[2]));
         satzPhrase.Add(phrase);
         satzSpeaker1.Add(speaker1);
         satzSpeaker2.Add(speaker2);
@@ -438,7 +487,8 @@
         satzSpeaker6.Add(speaker6);
         satzSpeaker7.Add(speaker7);
         satzSpeaker8.Add(speaker8);
-        satzSatz.Add(line[1][0] == '$' ? this.RequestIndex(cacheSatz, this._listSatz, line[0]) : satzNo);
+        satzOriginal.Add(original);
+        satzSatz.Add(line[1][0] == '$' ? RequestIndex(cacheSatz, _listSatz, line[0]) : satzNo);
 
         if (!satzende.Contains(line[0]))
         {
@@ -457,18 +507,20 @@
         docSpeaker6.Add(satzSpeaker6.ToArray());
         docSpeaker7.Add(satzSpeaker7.ToArray());
         docSpeaker8.Add(satzSpeaker8.ToArray());
+        docOriginal.Add(satzOriginal.ToArray());
         docSatz.Add(satzSatz.ToArray());
 
         // Zur Sicherheit um Satzübergreifene Prasen zu verhindern.
-        phrase = this.RequestIndex(cachePhrase, this._listPhrase, " ");
-        speaker1 = this.RequestIndex(cacheSpeaker, this._listSpeaker, " ");
-        speaker2 = this.RequestIndex(cacheSpeaker, this._listSpeaker, " ");
-        speaker3 = this.RequestIndex(cacheSpeaker, this._listSpeaker, " ");
-        speaker4 = this.RequestIndex(cacheSpeaker, this._listSpeaker, " ");
-        speaker5 = this.RequestIndex(cacheSpeaker, this._listSpeaker, " ");
-        speaker6 = this.RequestIndex(cacheSpeaker, this._listSpeaker, " ");
-        speaker7 = this.RequestIndex(cacheSpeaker, this._listSpeaker, " ");
-        speaker8 = this.RequestIndex(cacheSpeaker, this._listSpeaker, " ");
+        phrase = RequestIndex(cachePhrase, _listPhrase, " ");
+        speaker1 = RequestIndex(cacheSpeaker, _listSpeaker, " ");
+        speaker2 = RequestIndex(cacheSpeaker, _listSpeaker, " ");
+        speaker3 = RequestIndex(cacheSpeaker, _listSpeaker, " ");
+        speaker4 = RequestIndex(cacheSpeaker, _listSpeaker, " ");
+        speaker5 = RequestIndex(cacheSpeaker, _listSpeaker, " ");
+        speaker6 = RequestIndex(cacheSpeaker, _listSpeaker, " ");
+        speaker7 = RequestIndex(cacheSpeaker, _listSpeaker, " ");
+        speaker8 = RequestIndex(cacheSpeaker, _listSpeaker, " ");
+        original = RequestIndex(cacheOrignial, _listOriginal, " ");
 
         satzWort = null;
         satzPos = null;
@@ -482,22 +534,24 @@
         satzSpeaker6 = null;
         satzSpeaker7 = null;
         satzSpeaker8 = null;
+        satzOriginal = null;
         satzSatz = null;
       }
 
-      this._docWort.Add(guid, docWort.ToArray());
-      this._docLemma.Add(guid, docLemma.ToArray());
-      this._docPos.Add(guid, docPos.ToArray());
-      this._docPhrase.Add(guid, docPhrase.ToArray());
-      this._docSatz.Add(guid, docSatz.ToArray());
-      this._docSpeaker1.Add(guid, docSpeaker1.ToArray());
-      this._docSpeaker2.Add(guid, docSpeaker2.ToArray());
-      this._docSpeaker3.Add(guid, docSpeaker3.ToArray());
-      this._docSpeaker4.Add(guid, docSpeaker4.ToArray());
-      this._docSpeaker5.Add(guid, docSpeaker5.ToArray());
-      this._docSpeaker6.Add(guid, docSpeaker6.ToArray());
-      this._docSpeaker7.Add(guid, docSpeaker7.ToArray());
-      this._docSpeaker8.Add(guid, docSpeaker8.ToArray());
+      _docWort.Add(guid, docWort.ToArray());
+      _docLemma.Add(guid, docLemma.ToArray());
+      _docPos.Add(guid, docPos.ToArray());
+      _docPhrase.Add(guid, docPhrase.ToArray());
+      _docSatz.Add(guid, docSatz.ToArray());
+      _docSpeaker1.Add(guid, docSpeaker1.ToArray());
+      _docSpeaker2.Add(guid, docSpeaker2.ToArray());
+      _docSpeaker3.Add(guid, docSpeaker3.ToArray());
+      _docSpeaker4.Add(guid, docSpeaker4.ToArray());
+      _docSpeaker5.Add(guid, docSpeaker5.ToArray());
+      _docSpeaker6.Add(guid, docSpeaker6.ToArray());
+      _docSpeaker7.Add(guid, docSpeaker7.ToArray());
+      _docSpeaker8.Add(guid, docSpeaker8.ToArray());
+      _docOrignal.Add(guid, docOriginal.ToArray());
     }
 
     /// <summary>
@@ -505,28 +559,26 @@
     /// </summary>
     private void ParseMetadata()
     {
-      foreach (var sdm in this._docs)
-      {
-        var dic = new Dictionary<string, object>();
+      var meta = new ConcurrentDictionary<Guid, Dictionary<string, object>>();
 
-        var guid = sdm.Get("GUID", Guid.NewGuid());
-        dic.Add("GUID", guid);
-        dic.Add("Titel", sdm.Get("Titel", guid.ToString()));
-        dic.Add("Autor", sdm.Get("Autor", "Kein Autor"));
-        dic.Add("Datum", sdm.Get("Datum", DateTime.MinValue));
-        dic.Add("Publikationsart", sdm.Get("Publikationsart", "Keine Zuordnung"));
-        dic.Add("Rubrik", sdm.Get("Rubrik", "Keine Zuordnung"));
-        dic.Add("Zeitung", sdm.Get("Zeitung", "Keine Zuordnung"));
+      Parallel.ForEach(
+        _docs,
+        sdm =>
+        {
+          var dic = sdm.GetMetaDictionary().ToDictionary(entry => entry.Key, entry => entry.Value);
+          var guid = sdm.Get("GUID", Guid.NewGuid());
+          dic.Add("GUID", guid);
+          meta.TryAdd(guid, dic);
+        });
 
-        this._meta.Add(guid, dic);
-      }
+      _meta = meta.ToDictionary(x => x.Key, x => x.Value);
     }
 
     /// <summary>
     ///   The parse scrap document with tree tagger.
     /// </summary>
     /// <param name="parserSkript">
-    ///   The parser skript.
+    ///   The Tagger skript.
     /// </param>
     /// <param name="docs">
     ///   The docs.
@@ -673,7 +725,7 @@
         return cache[data];
       }
 
-      var idx = this.RequestIndex(list, data);
+      var idx = RequestIndex(list, data);
       cache.Add(data, idx);
       return idx;
     }
@@ -692,7 +744,7 @@
     /// </returns>
     private int RequestIndex(ListOptimized<string> list, string data)
     {
-      lock (this._requestIndexLock)
+      lock (_requestIndexLock)
       {
         var idx = list.IndexOf(data);
         if (idx > -1)

@@ -1,9 +1,13 @@
+#region
+
+using System;
+using System.Collections.Generic;
+using System.Xml.Serialization;
+
+#endregion
+
 namespace CorpusExplorer.Tool4.KAMOKO.Model
 {
-  using System;
-  using System.Collections.Generic;
-  using System.Xml.Serialization;
-
   [XmlRoot]
   [Serializable]
   public class Document
@@ -12,8 +16,8 @@ namespace CorpusExplorer.Tool4.KAMOKO.Model
 
     public Document()
     {
-      this.Index = "1";
-      this.Sentences = new List<Sentence>();
+      Index = "1";
+      Sentences = new List<Sentence>();
     }
 
     #endregion

@@ -1,10 +1,13 @@
-﻿namespace CorpusExplorer.Tool4.KAMOKO.Controls.Abstract
+﻿#region
+
+using System.Windows.Forms;
+using CorpusExplorer.Tool4.KAMOKO.Controls.Delegates;
+using CorpusExplorer.Tool4.KAMOKO.Model.Fragment.Abstract;
+
+#endregion
+
+namespace CorpusExplorer.Tool4.KAMOKO.Controls.Abstract
 {
-  using System.Windows.Forms;
-
-  using CorpusExplorer.Tool4.KAMOKO.Controls.Delegates;
-  using CorpusExplorer.Tool4.KAMOKO.Model.Fragment.Abstract;
-
   public partial class AbstractFragmentControl : AbstractUserControl
   {
     #region Constructors and Destructors
@@ -16,6 +19,15 @@
 
     #endregion
 
+    #region Public Methods and Operators
+
+    public virtual AbstractFragment GetFragment()
+    {
+      return null;
+    }
+
+    #endregion
+
     #region Public Events
 
     public event FragmentManipulationDelegate FragmentAddConstant;
@@ -23,15 +35,6 @@
     public event FragmentManipulationDelegate FragmentAddVariable;
 
     public event FragmentManipulationDelegate FragmentDelete;
-
-    #endregion
-
-    #region Public Methods and Operators
-
-    public virtual AbstractFragment GetFragment()
-    {
-      return null;
-    }
 
     #endregion
 

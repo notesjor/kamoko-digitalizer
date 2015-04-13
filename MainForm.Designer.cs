@@ -35,6 +35,7 @@
       this.btn_course_new = new Telerik.WinControls.UI.CommandBarButton();
       this.btn_course_open = new Telerik.WinControls.UI.CommandBarButton();
       this.btn_course_save = new Telerik.WinControls.UI.CommandBarButton();
+      this.btn_course_saveas = new Telerik.WinControls.UI.CommandBarButton();
       this.commandBarSeparator1 = new Telerik.WinControls.UI.CommandBarSeparator();
       this.btn_page_add = new Telerik.WinControls.UI.CommandBarButton();
       this.commandBarLabel1 = new Telerik.WinControls.UI.CommandBarLabel();
@@ -49,8 +50,11 @@
       this.btn_sentence_prev = new Telerik.WinControls.UI.CommandBarButton();
       this.lbl_sentence_view = new Telerik.WinControls.UI.CommandBarLabel();
       this.btn_sentence_next = new Telerik.WinControls.UI.CommandBarButton();
+      this.btn_sentence_source = new Telerik.WinControls.UI.CommandBarButton();
       this.commandBarSeparator2 = new Telerik.WinControls.UI.CommandBarSeparator();
       this.btn_export = new Telerik.WinControls.UI.CommandBarButton();
+      this.commandBarSeparator3 = new Telerik.WinControls.UI.CommandBarSeparator();
+      this.btn_errorConsole = new Telerik.WinControls.UI.CommandBarButton();
       this.radScrollablePanel1 = new Telerik.WinControls.UI.RadScrollablePanel();
       ((System.ComponentModel.ISupportInitialize)(this.radCommandBar1)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.radScrollablePanel1)).BeginInit();
@@ -65,7 +69,7 @@
       this.radCommandBar1.Name = "radCommandBar1";
       this.radCommandBar1.Rows.AddRange(new Telerik.WinControls.UI.CommandBarRowElement[] {
             this.commandBarRowElement1});
-      this.radCommandBar1.Size = new System.Drawing.Size(877, 69);
+      this.radCommandBar1.Size = new System.Drawing.Size(1010, 69);
       this.radCommandBar1.TabIndex = 0;
       this.radCommandBar1.Text = "radCommandBar1";
       // 
@@ -82,6 +86,7 @@
             this.btn_course_new,
             this.btn_course_open,
             this.btn_course_save,
+            this.btn_course_saveas,
             this.commandBarSeparator1,
             this.btn_page_add,
             this.commandBarLabel1,
@@ -96,8 +101,11 @@
             this.btn_sentence_prev,
             this.lbl_sentence_view,
             this.btn_sentence_next,
+            this.btn_sentence_source,
             this.commandBarSeparator2,
-            this.btn_export});
+            this.btn_export,
+            this.commandBarSeparator3,
+            this.btn_errorConsole});
       this.commandBarStripElement1.Name = "commandBarStripElement1";
       // 
       // btn_course_new
@@ -132,6 +140,16 @@
       this.btn_course_save.Name = "btn_course_save";
       this.btn_course_save.Text = "Kurs speichern";
       this.btn_course_save.Click += new System.EventHandler(this.btn_course_save_Click);
+      // 
+      // btn_course_saveas
+      // 
+      this.btn_course_saveas.AccessibleDescription = "Kurs speichern unter...";
+      this.btn_course_saveas.AccessibleName = "Kurs speichern unter...";
+      this.btn_course_saveas.DisplayName = "commandBarButton1";
+      this.btn_course_saveas.Image = global::CorpusExplorer.Tool4.KAMOKO.Properties.Resources.storage_floppy_save;
+      this.btn_course_saveas.Name = "btn_course_saveas";
+      this.btn_course_saveas.Text = "Kurs speichern unter...";
+      this.btn_course_saveas.Click += new System.EventHandler(this.btn_course_saveas_Click);
       // 
       // commandBarSeparator1
       // 
@@ -264,6 +282,17 @@
       this.btn_sentence_next.Text = "Satz vor";
       this.btn_sentence_next.Click += new System.EventHandler(this.btn_sentence_next_Click);
       // 
+      // btn_sentence_source
+      // 
+      this.btn_sentence_source.AccessibleDescription = "Satzquelle vermerken";
+      this.btn_sentence_source.AccessibleName = "Satzquelle vermerken";
+      this.btn_sentence_source.DisplayName = "commandBarButton1";
+      this.btn_sentence_source.Image = global::CorpusExplorer.Tool4.KAMOKO.Properties.Resources.tag_green;
+      this.btn_sentence_source.Margin = new System.Windows.Forms.Padding(5, 0, 0, 0);
+      this.btn_sentence_source.Name = "btn_sentence_source";
+      this.btn_sentence_source.Text = "Satzquelle vermerken";
+      this.btn_sentence_source.Click += new System.EventHandler(this.btn_sentence_source_Click);
+      // 
       // commandBarSeparator2
       // 
       this.commandBarSeparator2.AccessibleDescription = "commandBarSeparator2";
@@ -283,6 +312,24 @@
       this.btn_export.Text = "Exportieren";
       this.btn_export.Click += new System.EventHandler(this.btn_export_Click);
       // 
+      // commandBarSeparator3
+      // 
+      this.commandBarSeparator3.AccessibleDescription = "commandBarSeparator3";
+      this.commandBarSeparator3.AccessibleName = "commandBarSeparator3";
+      this.commandBarSeparator3.DisplayName = "commandBarSeparator3";
+      this.commandBarSeparator3.Name = "commandBarSeparator3";
+      this.commandBarSeparator3.VisibleInOverflowMenu = false;
+      // 
+      // btn_errorConsole
+      // 
+      this.btn_errorConsole.AccessibleDescription = "Fehler anzeigen";
+      this.btn_errorConsole.AccessibleName = "Fehler anzeigen";
+      this.btn_errorConsole.DisplayName = "commandBarButton1";
+      this.btn_errorConsole.Image = global::CorpusExplorer.Tool4.KAMOKO.Properties.Resources.worker;
+      this.btn_errorConsole.Name = "btn_errorConsole";
+      this.btn_errorConsole.Text = "Fehler anzeigen";
+      this.btn_errorConsole.Click += new System.EventHandler(this.btn_errorConsole_Click);
+      // 
       // radScrollablePanel1
       // 
       this.radScrollablePanel1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -291,8 +338,8 @@
       // 
       // radScrollablePanel1.PanelContainer
       // 
-      this.radScrollablePanel1.PanelContainer.Size = new System.Drawing.Size(875, 382);
-      this.radScrollablePanel1.Size = new System.Drawing.Size(877, 384);
+      this.radScrollablePanel1.PanelContainer.Size = new System.Drawing.Size(1008, 382);
+      this.radScrollablePanel1.Size = new System.Drawing.Size(1010, 384);
       this.radScrollablePanel1.TabIndex = 1;
       this.radScrollablePanel1.Text = "radScrollablePanel1";
       // 
@@ -300,7 +347,7 @@
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(877, 453);
+      this.ClientSize = new System.Drawing.Size(1010, 453);
       this.Controls.Add(this.radScrollablePanel1);
       this.Controls.Add(this.radCommandBar1);
       this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -313,6 +360,7 @@
       this.RootElement.MaxSize = new System.Drawing.Size(0, 0);
       this.Text = "KAMOKO - Digitalizer";
       this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
+      this.Load += new System.EventHandler(this.MainForm_Load);
       ((System.ComponentModel.ISupportInitialize)(this.radCommandBar1)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.radScrollablePanel1)).EndInit();
       this.radScrollablePanel1.ResumeLayout(false);
@@ -347,5 +395,9 @@
     private Telerik.WinControls.UI.CommandBarButton btn_sentence_add;
     private Telerik.WinControls.UI.CommandBarLabel lbl_page_view;
     private Telerik.WinControls.UI.CommandBarLabel lbl_sentence_view;
+    private Telerik.WinControls.UI.CommandBarButton btn_course_saveas;
+    private Telerik.WinControls.UI.CommandBarSeparator commandBarSeparator3;
+    private Telerik.WinControls.UI.CommandBarButton btn_errorConsole;
+    private Telerik.WinControls.UI.CommandBarButton btn_sentence_source;
   }
 }

@@ -1,20 +1,24 @@
-﻿namespace CorpusExplorer.Tool4.KAMOKO.Model.Fragment.Abstract
-{
-  using System;
-  using System.Collections.Generic;
-  using System.Xml.Serialization;
+﻿#region
 
+using System;
+using System.Collections.Generic;
+using System.Xml.Serialization;
+
+#endregion
+
+namespace CorpusExplorer.Tool4.KAMOKO.Model.Fragment.Abstract
+{
   [XmlRoot]
   [Serializable]
-  [XmlInclude(typeof(ConstantFragment))]
-  [XmlInclude(typeof(VariableFragment))]
+  [XmlInclude(typeof (ConstantFragment))]
+  [XmlInclude(typeof (VariableFragment))]
   public abstract class AbstractFragment
   {
     #region Constructors and Destructors
 
     public AbstractFragment()
     {
-      this.Index = -1;
+      Index = -1;
     }
 
     #endregion
@@ -27,7 +31,6 @@
     #endregion
 
     public abstract IEnumerable<string> GetSourceStrings();
-
     public abstract int GetSpeakerMax();
   }
 }

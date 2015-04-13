@@ -1,9 +1,13 @@
-﻿namespace CorpusExplorer.Tool4.KAMOKO.Model
-{
-  using System;
-  using System.Collections.Generic;
-  using System.Xml.Serialization;
+﻿#region
 
+using System;
+using System.Collections.Generic;
+using System.Xml.Serialization;
+
+#endregion
+
+namespace CorpusExplorer.Tool4.KAMOKO.Model
+{
   [XmlRoot]
   [Serializable]
   public class Course

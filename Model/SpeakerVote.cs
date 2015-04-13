@@ -1,11 +1,14 @@
+#region
+
+using System;
+using System.Xml.Serialization;
+using CorpusExplorer.Tool4.KAMOKO.Model.Vote;
+using CorpusExplorer.Tool4.KAMOKO.Model.Vote.Abstract;
+
+#endregion
+
 namespace CorpusExplorer.Tool4.KAMOKO.Model
 {
-  using System;
-  using System.Xml.Serialization;
-
-  using CorpusExplorer.Tool4.KAMOKO.Model.Vote;
-  using CorpusExplorer.Tool4.KAMOKO.Model.Vote.Abstract;
-
   [XmlRoot]
   [Serializable]
   public class SpeakerVote
@@ -14,8 +17,8 @@ namespace CorpusExplorer.Tool4.KAMOKO.Model
 
     public SpeakerVote()
     {
-      this.SpeakerIndex = -1;
-      this.Vote = null;
+      SpeakerIndex = -1;
+      Vote = null;
     }
 
     #endregion
@@ -25,9 +28,9 @@ namespace CorpusExplorer.Tool4.KAMOKO.Model
     [XmlAttribute]
     public int SpeakerIndex { get; set; }
 
-    [XmlElement(typeof(VoteAccept))]
-    [XmlElement(typeof(VoteDenied))]
-    [XmlElement(typeof(VoteReservation))]
+    [XmlElement(typeof (VoteAccept))]
+    [XmlElement(typeof (VoteDenied))]
+    [XmlElement(typeof (VoteReservation))]
     public AbstractVote Vote { get; set; }
 
     #endregion

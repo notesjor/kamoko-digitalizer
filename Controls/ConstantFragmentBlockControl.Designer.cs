@@ -28,6 +28,7 @@
     /// </summary>
     private void InitializeComponent()
     {
+      this.components = new System.ComponentModel.Container();
       this.radPanel1 = new Telerik.WinControls.UI.RadPanel();
       this.radTextBox1 = new Telerik.WinControls.UI.RadTextBox();
       this.radCollapsiblePanel1 = new Telerik.WinControls.UI.RadCollapsiblePanel();
@@ -37,6 +38,8 @@
       this.btn_item_add_vars = new Telerik.WinControls.UI.RadMenuItem();
       this.btn_item_add_const = new Telerik.WinControls.UI.RadMenuItem();
       this.btn_item_remove = new Telerik.WinControls.UI.RadButton();
+      this.radCheckBox1 = new Telerik.WinControls.UI.RadCheckBox();
+      this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
       ((System.ComponentModel.ISupportInitialize)(this.radPanel1)).BeginInit();
       this.radPanel1.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.radTextBox1)).BeginInit();
@@ -45,6 +48,7 @@
       this.panel1.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.btn_item_add)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.btn_item_remove)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.radCheckBox1)).BeginInit();
       this.SuspendLayout();
       // 
       // radPanel1
@@ -67,6 +71,7 @@
       this.radTextBox1.Name = "radTextBox1";
       this.radTextBox1.Size = new System.Drawing.Size(498, 32);
       this.radTextBox1.TabIndex = 8;
+      this.toolTip1.SetToolTip(this.radTextBox1, "Geben Sie hier den Satzteil ein.");
       // 
       // radCollapsiblePanel1
       // 
@@ -98,6 +103,7 @@
       // 
       // panel1
       // 
+      this.panel1.Controls.Add(this.radCheckBox1);
       this.panel1.Controls.Add(this.btn_item_add);
       this.panel1.Controls.Add(this.btn_item_remove);
       this.panel1.Dock = System.Windows.Forms.DockStyle.Right;
@@ -119,6 +125,7 @@
       this.btn_item_add.ShowArrow = false;
       this.btn_item_add.Size = new System.Drawing.Size(33, 33);
       this.btn_item_add.TabIndex = 2;
+      this.toolTip1.SetToolTip(this.btn_item_add, "Neuen Satzteil hinzufügen");
       // 
       // btn_item_add_vars
       // 
@@ -146,7 +153,21 @@
       this.btn_item_remove.Name = "btn_item_remove";
       this.btn_item_remove.Size = new System.Drawing.Size(33, 33);
       this.btn_item_remove.TabIndex = 0;
+      this.toolTip1.SetToolTip(this.btn_item_remove, "Diesen Satzteil entfernen");
       this.btn_item_remove.Click += new System.EventHandler(this.btn_item_remove_Click);
+      // 
+      // radCheckBox1
+      // 
+      this.radCheckBox1.AutoSize = false;
+      this.radCheckBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+      this.radCheckBox1.Location = new System.Drawing.Point(0, 33);
+      this.radCheckBox1.Margin = new System.Windows.Forms.Padding(0);
+      this.radCheckBox1.Name = "radCheckBox1";
+      this.radCheckBox1.Size = new System.Drawing.Size(33, 128);
+      this.radCheckBox1.TabIndex = 3;
+      this.toolTip1.SetToolTip(this.radCheckBox1, "Ist Original?");
+      ((Telerik.WinControls.UI.RadCheckBoxElement)(this.radCheckBox1.GetChildAt(0))).Text = "";
+      ((Telerik.WinControls.UI.RadCheckBoxElement)(this.radCheckBox1.GetChildAt(0))).Padding = new System.Windows.Forms.Padding(5, 5, 0, 4);
       // 
       // ConstantFragmentBlockControl
       // 
@@ -163,6 +184,7 @@
       this.panel1.ResumeLayout(false);
       ((System.ComponentModel.ISupportInitialize)(this.btn_item_add)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.btn_item_remove)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.radCheckBox1)).EndInit();
       this.ResumeLayout(false);
 
     }
@@ -178,5 +200,7 @@
     private Telerik.WinControls.UI.RadDropDownButton btn_item_add;
     private Telerik.WinControls.UI.RadMenuItem btn_item_add_const;
     private Telerik.WinControls.UI.RadMenuItem btn_item_add_vars;
+    private System.Windows.Forms.ToolTip toolTip1;
+    private Telerik.WinControls.UI.RadCheckBox radCheckBox1;
   }
 }

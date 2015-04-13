@@ -1,21 +1,23 @@
-﻿namespace CorpusExplorer.Tool4.KAMOKO.Controller
+﻿#region
+
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Windows.Forms;
+using System.Xml.Serialization;
+using CorpusExplorer.Sdk.Helper;
+using CorpusExplorer.Sdk.Model.Scraper;
+using CorpusExplorer.Tool4.KAMOKO.Model;
+using CorpusExplorer.Tool4.KAMOKO.Model.Fragment;
+using CorpusExplorer.Tool4.KAMOKO.Model.Fragment.Abstract;
+using CorpusExplorer.Tool4.KAMOKO.Parser;
+
+#endregion
+
+namespace CorpusExplorer.Tool4.KAMOKO.Controller
 {
-  using System;
-  using System.Collections.Concurrent;
-  using System.Collections.Generic;
-  using System.Configuration;
-  using System.IO;
-  using System.Linq;
-  using System.Windows.Forms;
-  using System.Xml.Serialization;
-
-  using CorpusExplorer.Sdk.Helper;
-  using CorpusExplorer.Sdk.Model.Scraper;
-  using CorpusExplorer.Sdk.Utils.DocumentProcessing.Parser;
-  using CorpusExplorer.Tool4.KAMOKO.Model;
-  using CorpusExplorer.Tool4.KAMOKO.Model.Fragment;
-  using CorpusExplorer.Tool4.KAMOKO.Model.Fragment.Abstract;
-
   public class KamokoController
   {
     #region Fields
@@ -30,10 +32,22 @@
 
     #region Public Properties
 
+    public string CurrentSource
+    {
+      get { return _model.Documents[_privateIndexPage].Sentences[_privateIndexSentence].Source; }
+      set { _model.Documents[_privateIndexPage].Sentences[_privateIndexSentence].Source = value; }
+    }
+
     public IEnumerable<AbstractFragment> CurrentFragments
     {
       get
       {
+        if (_model == null || _model.Documents == null || _model.Documents.Count <= _privateIndexPage ||
+            _model.Documents[_privateIndexPage].Sentences == null ||
+            _model.Documents[_privateIndexPage].Sentences.Count <= _privateIndexSentence || _model.Documents[_privateIndexPage].Sentences[_privateIndexSentence].Fragments == null)
+        {
+          return new List<AbstractFragment>();
+        }
         return _model.Documents[_privateIndexPage].Sentences[_privateIndexSentence].Fragments;
       }
     }
@@ -42,6 +56,8 @@
     {
       get
       {
+        if (_model == null || _model.Documents == null || _model.Documents.Count <= _privateIndexPage)
+          return "0";
         return _model.Documents[_privateIndexPage].Index;
       }
     }
@@ -50,6 +66,8 @@
     {
       get
       {
+        if (_model == null || _model.Documents == null)
+          return "0 / 0";
         return string.Format("{0} / {1}", _privateIndexPage + 1, _model.Documents.Count);
       }
     }
@@ -58,6 +76,8 @@
     {
       get
       {
+        if (_model == null || _model.Documents == null || _model.Documents.Count <= _privateIndexPage || _model.Documents[_privateIndexPage].Sentences == null || _model.Documents[_privateIndexPage].Sentences.Count <= _privateIndexSentence)
+          return "0";
         return _model.Documents[_privateIndexPage].Sentences[_privateIndexSentence].Index;
       }
     }
@@ -66,12 +86,13 @@
     {
       get
       {
-        return string.Format(
-          "{0} / {1}",
-          _privateIndexSentence + 1,
-          _model.Documents[_privateIndexPage].Sentences.Count);
+        if (_model == null || _model.Documents == null || _model.Documents.Count <= _privateIndexPage || _model.Documents[_privateIndexPage].Sentences == null)
+          return "0 / 0";
+        return string.Format("{0} / {1}", _privateIndexSentence + 1, _model.Documents[_privateIndexPage].Sentences.Count);
       }
     }
+
+    public string SavePath { get; set; }
 
     #endregion
 
@@ -99,35 +120,35 @@
     {
       _model.Documents.Add(
         new Document
-          {
-            Index = (_model.Documents.Count + 1).ToString(),
-            Sentences =
-              new List<Sentence>
-                {
-                  new Sentence
+        {
+          Index = (_model.Documents.Count + 1).ToString(),
+          Sentences =
+            new List<Sentence>
+            {
+              new Sentence
+              {
+                Index = "1",
+                Fragments =
+                  new List<AbstractFragment>
+                  {
+                    new ConstantFragment
                     {
-                      Index = "1",
-                      Fragments =
-                        new List<AbstractFragment>
-                          {
-                            new ConstantFragment
-                              {
-                                Content
-                                  =
-                                  "",
-                                Index
-                                  = 1,
-                                SpeakerVotes
-                                  =
-                                  new List
-                                  <
-                                  SpeakerVote
-                                  >()
-                              }
-                          }
+                      Content
+                        =
+                        "",
+                      Index
+                        = 1,
+                      SpeakerVotes
+                        =
+                        new List
+                          <
+                            SpeakerVote
+                            >()
                     }
-                }
-          });
+                  }
+              }
+            }
+        });
 
       _privateIndexSentence = 0;
       _privateIndexPage = _model.Documents.Count - 1;
@@ -135,21 +156,25 @@
 
     public void AddSentence()
     {
+      if (_model == null || _model.Documents == null || _model.Documents.Count <= _privateIndexPage ||
+          _model.Documents[_privateIndexPage] == null || _model.Documents[_privateIndexPage].Sentences == null)
+        return;
+
       _model.Documents[_privateIndexPage].Sentences.Add(
         new Sentence
-          {
-            Index = (_model.Documents[_privateIndexPage].Sentences.Count + 1).ToString(),
-            Fragments =
-              new List<AbstractFragment>
-                {
-                  new ConstantFragment
-                    {
-                      Content = "",
-                      Index = 1,
-                      SpeakerVotes = new List<SpeakerVote>()
-                    }
-                }
-          });
+        {
+          Index = (_model.Documents[_privateIndexPage].Sentences.Count + 1).ToString(),
+          Fragments =
+            new List<AbstractFragment>
+            {
+              new ConstantFragment
+              {
+                Content = "",
+                Index = 1,
+                SpeakerVotes = new List<SpeakerVote>()
+              }
+            }
+        });
 
       _privateIndexSentence = _model.Documents[_privateIndexPage].Sentences.Count - 1;
     }
@@ -175,7 +200,7 @@
       if (string.IsNullOrEmpty(path))
         throw new ArgumentNullException("path");
 
-      Save(path + ".kamoko.xml");
+      Save();
 
       var sds = new List<ScrapDocument>();
       var speakerMax = 0;
@@ -191,34 +216,53 @@
             var max = fragment.GetSpeakerMax();
             if (max > speakerMax) speakerMax = max;
 
-            IEnumerable<string> items = null;
-
             if (res == null)
             {
-              items = fragment.GetSourceStrings();
+              res = fragment.GetSourceStrings();
             }
             else
             {
-              var temp1 = fragment.GetSourceStrings();
-              items = from x in res from y in temp1 select x + " " + y;
+              var temp1 = res.ToArray();
+              var temp2 = fragment.GetSourceStrings();
+              res = (from a in temp1 from b in temp2 select a + " " + b);
             }
-
-            res = items;
           }
 
-          sds.AddRange(res.Select(entry => new ScrapDocument(new Dictionary<string, object> { { "Text", entry }, { "Blatt/Satz", string.Format("{0}/{1}", document.Index, sentence.Index) }, { "Blatt", document.Index }, { "Satz", sentence.Index }, })));
+          if (res == null)
+            continue;
+
+          int counter = 0;
+          sds.AddRange(from x in res
+            where x.Length >= 5
+            select new ScrapDocument(new Dictionary<string, object>
+            {
+              {"Text", x},
+              {"Titel", string.Format("{0}/{1}/{2}", Format(document.Index), Format(sentence.Index), (++counter).ToString("D6")) },
+              {"Blatt", document.Index},
+              {"Satz", sentence.Index},
+              {"Quelle", sentence.Source}
+            }));
         }
       }
 
-      var parser = new TreeTaggerKamokoParser(speakerMax)
-                     {
-                       CorpusName = Path.GetFileNameWithoutExtension(path),
-                       ScraperResults = sds,
-                       TreeTaggerBatchFilename = "chunk-french.bat"
-                     };
+      var parser = new TreeTaggerKamokoTagger(speakerMax)
+      {
+        CorpusName = Path.GetFileNameWithoutExtension(path),
+        ScraperResults = sds,
+        TreeTaggerBatchFilename = "chunk-french.bat"
+      };
 
       var corpus = parser.Execute();
       corpus.Save(path);
+    }
+
+    public string Format(string index)
+    {
+      while (index.Length < 3)
+      {
+        index = "0" + index;
+      }
+      return index.ToUpper();
     }
 
     public void Load(string path)
@@ -231,7 +275,9 @@
         _model = xml.Deserialize(fs) as Course;
       }
 
-      if (this._model != null)
+      SavePath = path;
+
+      if (_model != null)
       {
         _privateIndexPage = 0;
         _privateIndexSentence = 0;
@@ -239,7 +285,7 @@
       }
 
       MessageBox.Show("Die Datei scheint beschädigt zu sein. Daher wurde ein neues Korpus erstellt.");
-      this.New();
+      New();
     }
 
     public void New()
@@ -263,6 +309,8 @@
 
     public void PagePlus()
     {
+      if (_model == null || _model.Documents == null) return;
+
       if (_privateIndexPage + 1 >= _model.Documents.Count)
       {
         return;
@@ -271,9 +319,9 @@
       _privateIndexPage++;
     }
 
-    public void Save(string path)
+    public void Save()
     {
-      using (var fs = new FileStream(path, FileMode.Create, FileAccess.Write))
+      using (var fs = new FileStream(SavePath, FileMode.Create, FileAccess.Write))
       {
         var xml = new XmlSerializer(typeof(Course));
         xml.Serialize(fs, _model);
@@ -282,11 +330,17 @@
 
     public void SaveSentence(List<AbstractFragment> fragments, string pageId, string sentenceId)
     {
+      if (_model == null || _model.Documents == null || _model.Documents.Count <= _privateIndexPage ||
+          _model.Documents[_privateIndexPage].Sentences == null ||
+          _model.Documents[_privateIndexPage].Sentences.Count <= _privateIndexSentence ||
+          _model.Documents[_privateIndexPage].Sentences[_privateIndexSentence].Fragments == null) return;
+
       var list = new List<AbstractFragment>();
-      for (var i = fragments.Count - 1; i > -1; i--)
-      {
-        list.Add(fragments[i]);
-      }
+      if (fragments != null)
+        for (var i = fragments.Count - 1; i > -1; i--)
+        {
+          list.Add(fragments[i]);
+        }
 
       _model.Documents[_privateIndexPage].Sentences[_privateIndexSentence].Fragments = list;
       _model.Documents[_privateIndexPage].Sentences[_privateIndexSentence].Index = sentenceId;
@@ -308,6 +362,9 @@
 
     public void SentencePlus()
     {
+      if (_model == null || _model.Documents == null || _model.Documents.Count <= _privateIndexPage ||
+          _model.Documents[_privateIndexPage].Sentences == null) return;
+
       if (_privateIndexSentence + 1 >= _model.Documents[_privateIndexPage].Sentences.Count)
       {
         if (_privateIndexPage + 1 < _model.Documents.Count)
