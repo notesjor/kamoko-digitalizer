@@ -63,3 +63,5 @@ XDepencies
 /CorpusExplorer/CorpusExplorer.Sdk.Extern.Plaintext.Test/testdata/*.cex
 /*.ilproj
 /Properties/*.licx
+*.licx
+*.ilproj
