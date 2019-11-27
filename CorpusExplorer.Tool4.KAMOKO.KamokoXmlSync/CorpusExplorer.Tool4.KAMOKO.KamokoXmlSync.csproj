@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CorpusExplorer.Tool4.KAMOKO.KamokoXmlSync</RootNamespace>
     <AssemblyName>CorpusExplorer.Tool4.KAMOKO.KamokoXmlSync</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -22,6 +23,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -48,9 +50,17 @@
       <Project>{3226C218-0FB3-43A6-A67C-39CBAC704EA3}</Project>
       <Name>BitCutStudios.CorpusExplorer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\CorpusExplorer.Tool4.KAMOKO\CorpusExplorer.Tool4.KAMOKO.csproj">
-      <Project>{924397DD-2560-4C88-A1B6-93A935EFC859}</Project>
-      <Name>CorpusExplorer.Tool4.KAMOKO</Name>
+    <ProjectReference Include="..\CorpusExplorer.Core\CorpusExplorer.Core.csproj">
+      <Project>{029fe5a6-9504-499a-9e0d-05754d44cbb1}</Project>
+      <Name>CorpusExplorer.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CorpusExplorer.Sdk\CorpusExplorer.Sdk.csproj">
+      <Project>{dc1b5a58-29da-476d-89f8-e73a1db11e52}</Project>
+      <Name>CorpusExplorer.Sdk</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CorpusExplorer.Tool4.KAMOKO.Model\CorpusExplorer.Tool4.KAMOKO.Model.csproj">
+      <Project>{3e8c0170-1d13-4c87-a474-8f5c0493d23d}</Project>
+      <Name>CorpusExplorer.Tool4.KAMOKO.Model</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

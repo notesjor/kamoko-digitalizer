@@ -13,11 +13,17 @@ namespace CorpusExplorer.Tool4.KAMOKO.Model
   [Serializable]
   public class Course
   {
-    public Course() { Documents = new List<Document>(); }
+    public Course()
+    {
+      Documents = new List<Document>();
+    }
 
     [XmlArray]
     public List<Document> Documents { get; set; }
 
-    public Document GetDocument(Guid guid) => Documents.FirstOrDefault(d => d.DocumentGuid == guid);
+    public Document GetDocument(Guid guid)
+    {
+      return Documents.FirstOrDefault(d => d.DocumentGuid == guid);
+    }
   }
 }

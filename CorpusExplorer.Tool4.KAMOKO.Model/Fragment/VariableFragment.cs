@@ -1,7 +1,6 @@
 #region
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
@@ -15,27 +14,24 @@ namespace CorpusExplorer.Tool4.KAMOKO.Model.Fragment
   [Serializable]
   public class VariableFragment : AbstractFragment
   {
-    public VariableFragment() { Fragments = new List<AbstractFragment>(); }
+    public VariableFragment()
+    {
+      Fragments = new List<AbstractFragment>();
+    }
 
     [XmlArray]
     public List<AbstractFragment> Fragments { get; set; }
 
-    public override IEnumerable<string> GetSourceStrings()
+    public override Dictionary<string, SpeakerVote[]> GetSourceStrings(HashSet<int> ignoreSpeaker)
     {
-      var res = new ConcurrentBag<string>();
+      var res = new Dictionary<string, SpeakerVote[]>();
 
       foreach (var fragment in Fragments)
       {
-        IEnumerable<string> items;
-
-        if (res.Count == 0) items = fragment.GetSourceStrings();
-        else
-        {
-          var temp1 = fragment.GetSourceStrings();
-          items = from x in res from y in temp1 select x + " " + y;
-        }
-
-        foreach (var item in items) res.Add(item);
+        var items = fragment.GetSourceStrings(ignoreSpeaker);
+        foreach (var item in items)
+          if (!res.ContainsKey(item.Key))
+            res.Add(item.Key, item.Value);
       }
 
       return res;
@@ -44,7 +40,7 @@ namespace CorpusExplorer.Tool4.KAMOKO.Model.Fragment
     public override int GetSpeakerMax()
     {
       var res = Fragments.Select(fragment => fragment.GetSpeakerMax()).Concat(new[] {0}).Max();
-      return res;
+      return res < 0 ? 0 : res;
     }
   }
 }

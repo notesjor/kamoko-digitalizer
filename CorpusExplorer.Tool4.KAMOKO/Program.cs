@@ -3,8 +3,9 @@
 using System;
 using System.Windows.Forms;
 using CorpusExplorer.Sdk.Diagnostic;
-using CorpusExplorer.Sdk.Helper;
-using CorpusExplorer.Tool4.KAMOKO.Controller;
+using CorpusExplorer.Sdk.Ecosystem;
+using CorpusExplorer.Tool4.KAMOKO.GUI.Forms;
+using CorpusExplorer.Tool4.KAMOKO.Model.Controller;
 
 #endregion
 
@@ -18,6 +19,7 @@ namespace CorpusExplorer.Tool4.KAMOKO
     [STAThread]
     private static void Main()
     {
+      CorpusExplorerEcosystem.InitializeMinimal();
       var controller = new KamokoController();
 
       try
@@ -32,8 +34,7 @@ namespace CorpusExplorer.Tool4.KAMOKO
         var form = new ErrorConsole();
         form.ShowDialog();
 
-        if (controller != null &&
-            !string.IsNullOrEmpty(controller.SavePath))
+        if (!string.IsNullOrEmpty(controller?.SavePath))
         {
           controller.SavePath += ".emergency";
           controller.Save();

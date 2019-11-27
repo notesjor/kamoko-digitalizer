@@ -16,5 +16,8 @@ namespace CorpusExplorer.Tool4.KAMOKO.Model.Vote.Abstract
   {
     [XmlAttribute]
     public abstract string Label { get; }
+
+    [XmlIgnore]
+    public abstract byte Level { get; }
   }
 }
