@@ -13,6 +13,9 @@ namespace CorpusExplorer.Tool4.KAMOKO.Model.Vote
   public class VoteReservation : AbstractVote
   {
     [XmlAttribute]
-    public override string Label { get { return "Unter Vorbehalt"; } }
+    public override string Label => "Unter Vorbehalt";
+
+    [XmlIgnore]
+    public override byte Level { get; } = 20;
   }
 }

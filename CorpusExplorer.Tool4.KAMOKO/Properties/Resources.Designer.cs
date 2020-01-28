@@ -19,7 +19,7 @@ namespace CorpusExplorer.Tool4.KAMOKO.Properties {
     // -Klasse über ein Tool wie ResGen oder Visual Studio automatisch generiert.
     // Um einen Member hinzuzufügen oder zu entfernen, bearbeiten Sie die .ResX-Datei und führen dann ResGen
     // mit der /str-Option erneut aus, oder Sie erstellen Ihr VS-Projekt neu.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -222,7 +222,7 @@ namespace CorpusExplorer.Tool4.KAMOKO.Properties {
         /// </summary>
         internal static string FileExtension_KAMOKO_XML {
             get {
-                return ResourceManager.GetString("FileExtension_KAMOKO-XML", resourceCulture);
+                return ResourceManager.GetString("FileExtension_KAMOKO_XML", resourceCulture);
             }
         }
         
@@ -273,15 +273,6 @@ namespace CorpusExplorer.Tool4.KAMOKO.Properties {
             get {
                 object obj = ResourceManager.GetObject("item_disable", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Die Datei scheint beschädigt zu sein. Daher wurde ein neues Korpus erstellt. ähnelt.
-        /// </summary>
-        internal static string KamokoController_FileErrorNoOutput {
-            get {
-                return ResourceManager.GetString("KamokoController_FileErrorNoOutput", resourceCulture);
             }
         }
         

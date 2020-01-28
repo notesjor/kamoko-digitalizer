@@ -21,14 +21,17 @@ namespace CorpusExplorer.Tool4.KAMOKO.Model
     }
 
     [XmlAttribute]
-    public string Index { get; set; }
+    public Guid DocumentGuid { get; set; }
 
     [XmlAttribute]
-    public Guid DocumentGuid { get; set; }
+    public string Index { get; set; }
 
     [XmlArray]
     public List<Sentence> Sentences { get; set; }
 
-    public Sentence GetSentence(Guid guid) => Sentences.FirstOrDefault(s => s.SentenceGuid == guid);
+    public Sentence GetSentence(Guid guid)
+    {
+      return Sentences.FirstOrDefault(s => s.SentenceGuid == guid);
+    }
   }
 }

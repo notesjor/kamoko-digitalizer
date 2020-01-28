@@ -32,19 +32,27 @@ namespace CorpusExplorer.Tool4.KAMOKO.Model.Fragment
     [XmlArray]
     public List<SpeakerVote> SpeakerVotes { get; set; }
 
-    public override IEnumerable<string> GetSourceStrings()
+    public override Dictionary<string, SpeakerVote[]> GetSourceStrings(HashSet<int> ignoreSpeaker)
     {
-      if (SpeakerVotes.Count == 0) return new[] {Content.Trim()};
+      if (SpeakerVotes.Count == 0)
+        return new Dictionary<string, SpeakerVote[]> {{Content.Trim(), null}};
+
       var stb = new StringBuilder("\r\n<M");
-      foreach (var vote in SpeakerVotes)
-      {
+      var speaker = SpeakerVotes.Where(x => !ignoreSpeaker.Contains(x.SpeakerIndex)).ToArray();
+
+      foreach (var vote in speaker)
         stb.AppendFormat(
-          "S{0}{1}",
-          vote.SpeakerIndex,
-          vote.Vote is VoteAccept ? "Z" : vote.Vote is VoteReservation ? "B" : "A");
-      }
+                         "S{0}{1}",
+                         vote.SpeakerIndex,
+                         vote.Vote is VoteAccept ? "Z" : vote.Vote is VoteReservation ? "B" : "A");
       stb.Append(IsOriginal ? "ORIGINAL" : "");
-      return new[] {stb.ToString().Trim() + ">\r\n" + Content.Trim() + "\r\n</M>\r\n"};
+      return new Dictionary<string, SpeakerVote[]>
+      {
+        {
+          stb.ToString().Trim() + ">\r\n" + Content.Trim() + "\r\n</M>\r\n",
+          speaker
+        }
+      };
     }
 
     public override int GetSpeakerMax()

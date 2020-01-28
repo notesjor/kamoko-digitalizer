@@ -13,6 +13,9 @@ namespace CorpusExplorer.Tool4.KAMOKO.Model.Vote
   public class VoteAccept : AbstractVote
   {
     [XmlAttribute]
-    public override string Label { get { return "Zustimmung"; } }
+    public override string Label => "Zustimmung";
+
+    [XmlIgnore]
+    public override byte Level { get; } = 10;
   }
 }

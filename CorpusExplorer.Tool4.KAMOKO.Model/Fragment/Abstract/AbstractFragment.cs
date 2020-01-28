@@ -14,12 +14,15 @@ namespace CorpusExplorer.Tool4.KAMOKO.Model.Fragment.Abstract
   [XmlInclude(typeof(VariableFragment))]
   public abstract class AbstractFragment
   {
-    protected AbstractFragment() { Index = -1; }
+    protected AbstractFragment()
+    {
+      Index = -1;
+    }
 
     [XmlAttribute]
     public int Index { get; set; }
 
-    public abstract IEnumerable<string> GetSourceStrings();
+    public abstract Dictionary<string, SpeakerVote[]> GetSourceStrings(HashSet<int> ignoreSpeaker);
     public abstract int GetSpeakerMax();
   }
 }

@@ -13,6 +13,9 @@ namespace CorpusExplorer.Tool4.KAMOKO.Model.Vote
   public class VoteDenied : AbstractVote
   {
     [XmlAttribute]
-    public override string Label { get { return "Ablehnung"; } }
+    public override string Label => "Ablehnung";
+
+    [XmlIgnore]
+    public override byte Level { get; } = 30;
   }
 }
